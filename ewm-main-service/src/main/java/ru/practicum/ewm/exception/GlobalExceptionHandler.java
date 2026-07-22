@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
     public ApiError handleNotFound(NotFoundException exception) {
         return new ApiError(
                 HttpStatus.NOT_FOUND.name(),
-                "The required object was not found.",
+                "The required object was not found!!!",
                 exception.getMessage(),
                 LocalDateTime.now().format(FORMATTER)
         );
