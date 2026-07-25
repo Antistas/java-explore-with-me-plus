@@ -1,7 +1,7 @@
 package ru.practicum.stats.client;
 
-import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.stats.dto.EndpointHit;
 import ru.practicum.stats.dto.ViewStats;
 
@@ -40,7 +40,10 @@ public class StatsClient {
         String startStr = start.format(FORMATTER);
         String endStr = end.format(FORMATTER);
 
-        String url = serverUrl + "/stats?start=" + startStr + "&end=" + endStr;
+        UriComponentsBuilder urlBuild = UriComponentsBuilder.fromHttpUrl(serverUrl + "/stats")
+                .queryParam("start", startStr)
+                .queryParam("end", endStr);
+        String url = urlBuild.build().toUriString();
 
         if (uris != null && !uris.isEmpty()) {
             String urisParam = String.join("&uris=", uris);

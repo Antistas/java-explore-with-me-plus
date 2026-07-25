@@ -1,5 +1,6 @@
 package ru.practicum.ewm;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,7 @@ public class EwmMainServiceApplication {
     }
 
     @Bean
-    public StatsClient statsClient() {
-        return new StatsClient("http://stats-server:9090");
+    public StatsClient statsClient(@Value("${stats-server.url}")String statsServerUrl) {
+        return new StatsClient(statsServerUrl);
     }
 }
