@@ -23,7 +23,6 @@ import ru.practicum.gateway.compilation.dto.UpdateCompilationRequest;
 public class CompilationController {
 
     // 1. PUBLIC API (Доступно всем)
-
     @GetMapping("/compilations")
     public ResponseEntity<Object> getCompilationsPublic(
             @RequestParam(required = false) Boolean pinned,
@@ -34,7 +33,6 @@ public class CompilationController {
         return ResponseEntity.ok().build();
     }
 
-
     @GetMapping("/compilations/{compId}")
     public ResponseEntity<Object> getCompilationByIdPublic(@PathVariable Long compId) {
         log.info("Gateway stub: GET /compilations/{}", compId);
@@ -42,20 +40,17 @@ public class CompilationController {
     }
 
     // 2. ADMIN API (Только для администраторов)
-
     @PostMapping("/admin/compilations")
     public ResponseEntity<Object> addCompilationAdmin(@RequestBody @Valid NewCompilationDto compilationDto) {
         log.info("Gateway stub: POST /admin/compilations | body: {}", compilationDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-
     @DeleteMapping("/admin/compilations/{compId}")
     public ResponseEntity<Object> deleteCompilationAdmin(@PathVariable Long compId) {
         log.info("Gateway stub: DELETE /admin/compilations/{}", compId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
 
     @PatchMapping("/admin/compilations/{compId}")
     public ResponseEntity<Object> updateCompilationAdmin(

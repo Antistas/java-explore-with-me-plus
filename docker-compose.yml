@@ -47,6 +47,22 @@ services:
       stats-server:
         condition: service_started
 
+  explore-gateway:
+    build:
+      context: explore-gateway
+      dockerfile: Dockerfile
+    container_name: explore-gateway
+    ports:
+      - "7070:7070"
+    environment:
+      EWM_MAIN_SERVICE_URL: http://ewm-service:8080
+      STATS_SERVER_URL: http://stats-server:9090
+    depends_on:
+      ewm-service:
+        condition: service_started
+      stats-server:
+        condition: service_started
+
   ewm-db:
     image: postgres:16.1
     environment:

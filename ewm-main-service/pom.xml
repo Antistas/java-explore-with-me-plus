@@ -40,6 +40,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -56,7 +61,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>ru.practicum.ewm.EwmMainApplication</mainClass>
+                    <mainClass>ru.practicum.gateway.ewm.EwmMainServiceApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,11 +1,9 @@
-package ru.practicum.gateway.stats.client;
+package ru.practicum.stats.client;
 
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.stats.dto.EndpointHit;
 import ru.practicum.stats.dto.ViewStats;
-import org.springframework.web.client.RestClient;
-import ru.practicum.gateway.stats.dto.EndpointHit;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

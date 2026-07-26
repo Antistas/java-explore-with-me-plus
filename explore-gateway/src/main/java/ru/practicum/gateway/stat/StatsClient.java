@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.gateway.client.BaseClient;
 import ru.practicum.gateway.stat.dto.EndpointHitDto;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

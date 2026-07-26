@@ -23,7 +23,6 @@ import ru.practicum.gateway.category.dto.NewCategoryDto;
 public class CategoryController {
 
     // 1. PUBLIC API (Доступно всем)
-
     @GetMapping("/categories")
     public ResponseEntity<Object> getCategoriesPublic(
             @RequestParam(defaultValue = "0") @Min(0) int from,
@@ -40,21 +39,17 @@ public class CategoryController {
     }
 
     // 2. ADMIN API (Только для администраторов)
-
-
     @PostMapping("/admin/categories")
     public ResponseEntity<Object> addCategoryAdmin(@RequestBody @Valid NewCategoryDto categoryDto) {
         log.info("Gateway stub: POST /admin/categories | body: {}", categoryDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-
     @DeleteMapping("/admin/categories/{catId}")
     public ResponseEntity<Object> deleteCategoryAdmin(@PathVariable Long catId) {
         log.info("Gateway stub: DELETE /admin/categories/{}", catId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
 
     @PatchMapping("/admin/categories/{catId}")
     public ResponseEntity<Object> updateCategoryAdmin(

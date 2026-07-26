@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class RequestController {
 
-
     @GetMapping("/users/{userId}/requests")
     public ResponseEntity<Object> getUserRequestsPrivate(@PathVariable Long userId) {
         log.info("Gateway stub: GET /users/{}/requests", userId);

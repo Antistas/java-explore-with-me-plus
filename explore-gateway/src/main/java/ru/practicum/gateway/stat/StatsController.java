@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.gateway.stat.dto.EndpointHitDto;
-
 import java.util.List;
 
 @RestController
@@ -23,13 +22,11 @@ public class StatsController {
 
     private final StatsClient statsClient;
 
-
     @PostMapping("/hit")
     public ResponseEntity<Object> saveHit(@RequestBody @Valid EndpointHitDto hitDto) {
         log.info("Gateway: Получен запрос POST /hit с телом: {}", hitDto);
         return statsClient.saveHit(hitDto);
     }
-
 
     @GetMapping("/stats")
     public ResponseEntity<Object> getStats(

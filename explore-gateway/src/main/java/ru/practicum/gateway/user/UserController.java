@@ -14,15 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.gateway.user.dto.NewUserRequest;
-
 import java.util.List;
 
 @RestController
 @Slf4j
 @Validated
 public class UserController {
-
-
     @GetMapping("/admin/users")
     public ResponseEntity<Object> getUsersAdmin(
             @RequestParam(required = false) List<Long> ids,
@@ -33,13 +30,11 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-
     @PostMapping("/admin/users")
     public ResponseEntity<Object> registerUserAdmin(@RequestBody @Valid NewUserRequest userRequest) {
         log.info("Gateway stub: POST /admin/users | body: {}", userRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
 
     @DeleteMapping("/admin/users/{userId}")
     public ResponseEntity<Object> deleteUserAdmin(@PathVariable Long userId) {
