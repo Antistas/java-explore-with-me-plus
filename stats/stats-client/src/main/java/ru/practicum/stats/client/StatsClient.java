@@ -1,28 +1,59 @@
 package ru.practicum.stats.client;
 
-import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.stats.dto.EndpointHit;
+import ru.practicum.stats.dto.ViewStats;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class StatsClient {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private final RestClient restClient;
+    private final RestTemplate restTemplate;
+    private final String serverUrl;
 
     public StatsClient(String serverUrl) {
-        this.restClient = RestClient.builder()
-                .baseUrl(serverUrl)
-                .build();
+        this.serverUrl = serverUrl;
+        this.restTemplate = new RestTemplate();
+    }
+
+    public StatsClient(String serverUrl, RestTemplate restTemplate) {
+        this.serverUrl = serverUrl;
+        this.restTemplate = restTemplate;
     }
 
     public void saveHit(String app, String uri, String ip) {
-        EndpointHit hit = new EndpointHit(app, uri, ip, LocalDateTime.now().format(FORMATTER));
+        EndpointHit hit = EndpointHit.builder()
+                .app(app)
+                .uri(uri)
+                .ip(ip)
+                .timestamp(LocalDateTime.now().format(FORMATTER))
+                .build();
 
-        restClient.post()
-                .uri("/hit")
-                .body(hit)
-                .retrieve()
-                .toBodilessEntity();
+        restTemplate.postForEntity(serverUrl + "/hit", hit, Void.class);
+    }
+
+    public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+        String startStr = start.format(FORMATTER);
+        String endStr = end.format(FORMATTER);
+
+        UriComponentsBuilder urlBuild = UriComponentsBuilder.fromHttpUrl(serverUrl + "/stats")
+                .queryParam("start", startStr)
+                .queryParam("end", endStr);
+        String url = urlBuild.build().toUriString();
+
+        if (uris != null && !uris.isEmpty()) {
+            String urisParam = String.join("&uris=", uris);
+            url += "&uris=" + urisParam;
+        }
+
+        if (unique != null && unique) {
+            url += "&unique=true";
+        }
+
+        return restTemplate.getForObject(url.toString(), List.class);
     }
 }
