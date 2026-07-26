@@ -1,4 +1,4 @@
-package ru.practicum.stats_client;
+package ru.practicum.stats.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
