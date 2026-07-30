@@ -2,6 +2,7 @@ package ru.practicum.gateway.compilation;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,9 @@ import ru.practicum.gateway.compilation.dto.UpdateCompilationRequest;
 @RestController
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class CompilationController {
+    private final CompilationClient compilationClient;
 
     // 1. PUBLIC API (Доступно всем)
     @GetMapping("/compilations")
@@ -29,14 +32,14 @@ public class CompilationController {
             @RequestParam(defaultValue = "0") @Min(0) int from,
             @RequestParam(defaultValue = "10") @Min(1) int size) {
 
-        log.info("Gateway stub: GET /compilations | pinned={}, from={}, size={}", pinned, from, size);
-        return ResponseEntity.ok().build();
+        log.info("Gateway: GET /compilations | pinned={}, from={}, size={}", pinned, from, size);
+        return compilationClient.getCompilations(pinned, from, size);
     }
 
     @GetMapping("/compilations/{compId}")
     public ResponseEntity<Object> getCompilationByIdPublic(@PathVariable Long compId) {
-        log.info("Gateway stub: GET /compilations/{}", compId);
-        return ResponseEntity.ok().build();
+        log.info("Gateway: GET /compilations/{}", compId);
+        return compilationClient.getCompilation(compId);
     }
 
     // 2. ADMIN API (Только для администраторов)

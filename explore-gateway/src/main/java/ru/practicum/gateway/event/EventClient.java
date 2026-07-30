@@ -5,8 +5,8 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.gateway.client.BaseClient;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,34 +29,36 @@ public class EventClient extends BaseClient {
                                             String sort,
                                             int from,
                                             int size) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("onlyAvailable", onlyAvailable);
-        parameters.put("from", from);
-        parameters.put("size", size);
+        UriComponentsBuilder uri = UriComponentsBuilder
+                .fromPath("/events")
+                .queryParam("onlyAvailable", onlyAvailable)
+                .queryParam("from", from)
+                .queryParam("size", size);
 
-        StringBuilder path = new StringBuilder("/events?onlyAvailable={onlyAvailable}&from={from}&size={size}");
+        addQueryParam(uri, "text", text);
+        addQueryParam(uri, "paid", paid);
+        addQueryParam(uri, "rangeStart", rangeStart);
+        addQueryParam(uri, "rangeEnd", rangeEnd);
+        addQueryParam(uri, "sort", sort);
 
-        addParameter(path, parameters, "text", text);
-        addParameter(path, parameters, "categories", categories);
-        addParameter(path, parameters, "paid", paid);
-        addParameter(path, parameters, "rangeStart", rangeStart);
-        addParameter(path, parameters, "rangeEnd", rangeEnd);
-        addParameter(path, parameters, "sort", sort);
+        if (categories != null && !categories.isEmpty()) {
+            uri.queryParam("categories", categories.toArray());
+        }
 
-        return get(path.toString(), null, parameters);
+        return get(uri.build().toUriString());
+    }
+
+    private void addQueryParam(
+            UriComponentsBuilder uri,
+            String name,
+            Object value
+    ) {
+        if (value != null) {
+            uri.queryParam(name, value);
+        }
     }
 
     public ResponseEntity<Object> getEvent(long eventId) {
         return get("/events/{eventId}", null, Map.of("eventId", eventId));
-    }
-
-    private void addParameter(StringBuilder path,
-                              Map<String, Object> parameters,
-                              String name,
-                              Object value) {
-        if (value != null) {
-            path.append('&').append(name).append("={").append(name).append('}');
-            parameters.put(name, value);
-        }
     }
 }

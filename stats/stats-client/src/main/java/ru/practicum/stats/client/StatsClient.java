@@ -1,5 +1,9 @@
 package ru.practicum.stats.client;
 
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.stats.dto.EndpointHit;
@@ -43,17 +47,22 @@ public class StatsClient {
         UriComponentsBuilder urlBuild = UriComponentsBuilder.fromHttpUrl(serverUrl + "/stats")
                 .queryParam("start", startStr)
                 .queryParam("end", endStr);
-        String url = urlBuild.build().toUriString();
-
         if (uris != null && !uris.isEmpty()) {
-            String urisParam = String.join("&uris=", uris);
-            url += "&uris=" + urisParam;
+            urlBuild.queryParam("uris", uris.toArray());
         }
 
-        if (unique != null && unique) {
-            url += "&unique=true";
+        if (Boolean.TRUE.equals(unique)) {
+            urlBuild.queryParam("unique", true);
         }
 
-        return restTemplate.getForObject(url.toString(), List.class);
+        ResponseEntity<List<ViewStats>> response = restTemplate.exchange(
+                urlBuild.build().encode().toUri(),
+                HttpMethod.GET,
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        return response.getBody() == null ? List.of() : response.getBody();
     }
 }

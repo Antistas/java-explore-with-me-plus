@@ -58,7 +58,7 @@ public class EventController {
             @RequestParam(defaultValue = "10") @Min(1) int size,
             HttpServletRequest request) {
 
-        log.info("Gateway stub: GET /events | text={}, categories={}, paid={}, rangeStart={}, rangeEnd={}, onlyAvailable={}, sort={}, from={}, size={}",
+        log.info("Gateway: GET /events | text={}, categories={}, paid={}, rangeStart={}, rangeEnd={}, onlyAvailable={}, sort={}, from={}, size={}",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
 
         saveHit(request);
@@ -68,7 +68,7 @@ public class EventController {
     @GetMapping("/events/{id}")
     public ResponseEntity<Object> getEventByIdPublic(@PathVariable Long id,
                                                      HttpServletRequest request) {
-        log.info("Gateway stub: GET /events/{}", id);
+        log.info("Gateway: GET /events/{}", id);
         saveHit(request);
         return eventClient.getEvent(id);
     }

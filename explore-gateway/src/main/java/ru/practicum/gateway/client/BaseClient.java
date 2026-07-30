@@ -89,7 +89,12 @@ public class BaseClient {
                 shareitServerResponse = rest.exchange(path, method, requestEntity, Object.class);
             }
         } catch (HttpStatusCodeException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+            MediaType contentType = e.getResponseHeaders() == null
+                    ? MediaType.APPLICATION_JSON
+                    : e.getResponseHeaders().getContentType();
+            return ResponseEntity.status(e.getStatusCode())
+                    .contentType(contentType == null ? MediaType.APPLICATION_JSON : contentType)
+                    .body(e.getResponseBodyAsString());
         }
         return prepareGatewayResponse(shareitServerResponse);
     }
