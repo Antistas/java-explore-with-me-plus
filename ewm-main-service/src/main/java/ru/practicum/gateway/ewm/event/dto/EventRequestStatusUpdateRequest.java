@@ -5,11 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LocationDto {
-    private Double lat;
-    private Double lon;
+public class EventRequestStatusUpdateRequest {
+    private List<Long> requestIds;
+    private String status;
 }

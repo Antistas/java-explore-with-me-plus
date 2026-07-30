@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.gateway.ewm.category.dto.CategoryDto;
-import ru.practicum.gateway.ewm.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
 
@@ -13,14 +11,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class EventShortDto {
-    private Long id;
+public class UpdateEventUserRequest {
     private String annotation;
-    private CategoryDto category;
+    private Long category;
+    private String description;
     private LocalDateTime eventDate;
-    private UserShortDto initiator;
+    private LocationDto location;
     private Boolean paid;
+    private Integer participantLimit;
+    private Boolean requestModeration;
     private String title;
-    private Long confirmedRequests;
-    private Long views;
+    private String stateAction;
 }

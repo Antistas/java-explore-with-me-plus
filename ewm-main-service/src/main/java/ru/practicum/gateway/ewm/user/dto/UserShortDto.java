@@ -1,4 +1,4 @@
-package ru.practicum.gateway.ewm.event.dto;
+package ru.practicum.gateway.ewm.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LocationDto {
-    private Double lat;
-    private Double lon;
+public class UserShortDto {
+    private Long id;
+    private String name;
 }
