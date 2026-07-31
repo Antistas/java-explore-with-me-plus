@@ -36,6 +36,10 @@ public class StatsClient {
         restTemplate.postForEntity(serverUrl + "/hit", hit, Void.class);
     }
 
+    public void saveHit(EndpointHit hit) {
+        restTemplate.postForEntity(serverUrl + "/hit", hit, Void.class);
+    }
+
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         String startStr = start.format(FORMATTER);
         String endStr = end.format(FORMATTER);

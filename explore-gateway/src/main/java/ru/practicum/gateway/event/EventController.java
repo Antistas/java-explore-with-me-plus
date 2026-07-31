@@ -19,8 +19,9 @@ import ru.practicum.gateway.event.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.gateway.event.dto.NewEventDto;
 import ru.practicum.gateway.event.dto.UpdateEventAdminRequest;
 import ru.practicum.gateway.event.dto.UpdateEventUserRequest;
-import ru.practicum.gateway.stat.StatsClient;
-import ru.practicum.gateway.stat.dto.EndpointHitDto;
+import ru.practicum.stats.client.StatsClient;
+import ru.practicum.stats.dto.EndpointHit;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -74,7 +75,7 @@ public class EventController {
     }
 
     private void saveHit(HttpServletRequest request) {
-        EndpointHitDto hit = EndpointHitDto.builder()
+        EndpointHit hit = EndpointHit.builder()
                 .app(applicationName)
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
