@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.gateway.client.BaseClient;
+import ru.practicum.gateway.compilation.dto.NewCompilationDto;
+import ru.practicum.gateway.compilation.dto.UpdateCompilationRequest;
+
 import java.util.Map;
 
 @Service
@@ -16,7 +19,6 @@ public class CompilationClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getCompilations(Boolean pinned, int from, int size) {
-
         UriComponentsBuilder uri = UriComponentsBuilder
                 .fromPath("/compilations")
                 .queryParam("from", from)
@@ -31,5 +33,26 @@ public class CompilationClient extends BaseClient {
 
     public ResponseEntity<Object> getCompilation(long compilationId) {
         return get("/compilations/{compilationId}", null, Map.of("compilationId", compilationId));
+    }
+
+    public ResponseEntity<Object> createCompilation(NewCompilationDto request) {
+        return post("/admin/compilations", request);
+    }
+
+    public ResponseEntity<Object> updateCompilation(long compilationId, UpdateCompilationRequest request) {
+        return patch(
+                "/admin/compilations/{compilationId}",
+                null,
+                Map.of("compilationId", compilationId),
+                request
+        );
+    }
+
+    public ResponseEntity<Object> deleteCompilation(long compilationId) {
+        return delete(
+                "/admin/compilations/{compilationId}",
+                null,
+                Map.of("compilationId", compilationId)
+        );
     }
 }

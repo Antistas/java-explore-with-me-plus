@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,13 +24,11 @@ import ru.practicum.gateway.compilation.dto.UpdateCompilationRequest;
 public class CompilationController {
     private final CompilationClient compilationClient;
 
-    // 1. PUBLIC API (Доступно всем)
     @GetMapping("/compilations")
     public ResponseEntity<Object> getCompilationsPublic(
             @RequestParam(required = false) Boolean pinned,
             @RequestParam(defaultValue = "0") @Min(0) int from,
             @RequestParam(defaultValue = "10") @Min(1) int size) {
-
         log.info("Gateway: GET /compilations | pinned={}, from={}, size={}", pinned, from, size);
         return compilationClient.getCompilations(pinned, from, size);
     }
@@ -42,25 +39,24 @@ public class CompilationController {
         return compilationClient.getCompilation(compId);
     }
 
-    // 2. ADMIN API (Только для администраторов)
     @PostMapping("/admin/compilations")
-    public ResponseEntity<Object> addCompilationAdmin(@RequestBody @Valid NewCompilationDto compilationDto) {
-        log.info("Gateway stub: POST /admin/compilations | body: {}", compilationDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<Object> addCompilationAdmin(
+            @RequestBody @Valid NewCompilationDto compilationDto) {
+        log.info("Gateway: POST /admin/compilations | body={}", compilationDto);
+        return compilationClient.createCompilation(compilationDto);
     }
 
     @DeleteMapping("/admin/compilations/{compId}")
     public ResponseEntity<Object> deleteCompilationAdmin(@PathVariable Long compId) {
-        log.info("Gateway stub: DELETE /admin/compilations/{}", compId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        log.info("Gateway: DELETE /admin/compilations/{}", compId);
+        return compilationClient.deleteCompilation(compId);
     }
 
     @PatchMapping("/admin/compilations/{compId}")
     public ResponseEntity<Object> updateCompilationAdmin(
             @PathVariable Long compId,
             @RequestBody @Valid UpdateCompilationRequest updateRequest) {
-
-        log.info("Gateway stub: PATCH /admin/compilations/{} | body: {}", compId, updateRequest);
-        return ResponseEntity.ok().build();
+        log.info("Gateway: PATCH /admin/compilations/{} | body={}", compId, updateRequest);
+        return compilationClient.updateCompilation(compId, updateRequest);
     }
 }
