@@ -65,7 +65,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>ru.practicum.gateway.ewm.EwmMainServiceApplication</mainClass>
+                    <mainClass>ru.practicum.gateway.EwmMainServiceApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
