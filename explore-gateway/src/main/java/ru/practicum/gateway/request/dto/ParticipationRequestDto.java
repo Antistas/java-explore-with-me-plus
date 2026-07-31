@@ -26,5 +26,5 @@ public class ParticipationRequestDto {
     private Long requester;
 
     @NotNull(message = "Status cannot be null")
-    private String status; // PENDING, CONFIRMED, REJECTED, CANCELED
+    private String status;
 }
