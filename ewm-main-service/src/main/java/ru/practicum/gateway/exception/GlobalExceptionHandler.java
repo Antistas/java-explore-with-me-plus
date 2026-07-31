@@ -3,6 +3,7 @@ package ru.practicum.gateway.exception;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -35,6 +36,7 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException.class,
             MissingServletRequestParameterException.class,
             MethodArgumentNotValidException.class,
+            HttpMessageNotReadableException.class,
             HandlerMethodValidationException.class,
             ConstraintViolationException.class
     })

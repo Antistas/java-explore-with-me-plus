@@ -9,6 +9,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.gateway.client.BaseClient;
 import ru.practicum.gateway.event.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.gateway.event.dto.NewEventDto;
+import ru.practicum.gateway.event.dto.UpdateEventAdminRequest;
 import ru.practicum.gateway.event.dto.UpdateEventUserRequest;
 
 import java.util.List;
@@ -44,10 +45,7 @@ public class EventClient extends BaseClient {
         addQueryParam(uri, "rangeStart", rangeStart);
         addQueryParam(uri, "rangeEnd", rangeEnd);
         addQueryParam(uri, "sort", sort);
-
-        if (categories != null && !categories.isEmpty()) {
-            uri.queryParam("categories", categories.toArray());
-        }
+        addListQueryParam(uri, "categories", categories);
 
         return get(uri.build().toUriString());
     }
@@ -56,7 +54,7 @@ public class EventClient extends BaseClient {
         return get("/events/{eventId}", null, Map.of("eventId", eventId));
     }
 
-    public ResponseEntity<Object> getEventsByUser(Long userId, int from, int size) {
+    public ResponseEntity<Object> getEventsByUser(long userId, int from, int size) {
         return get(
                 "/users/{userId}/events?from={from}&size={size}",
                 userId,
@@ -64,7 +62,7 @@ public class EventClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> addEvent(Long userId, NewEventDto eventDto) {
+    public ResponseEntity<Object> addEvent(long userId, NewEventDto eventDto) {
         return post(
                 "/users/{userId}/events",
                 userId,
@@ -73,7 +71,7 @@ public class EventClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getEventByUser(Long userId, Long eventId) {
+    public ResponseEntity<Object> getEventByUser(long userId, long eventId) {
         return get(
                 "/users/{userId}/events/{eventId}",
                 userId,
@@ -81,20 +79,18 @@ public class EventClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> updateEventByUser(
-            Long userId,
-            Long eventId,
-            UpdateEventUserRequest updateRequest
-    ) {
+    public ResponseEntity<Object> updateEventByUser(long userId,
+                                                    long eventId,
+                                                    UpdateEventUserRequest request) {
         return patch(
                 "/users/{userId}/events/{eventId}",
                 userId,
                 Map.of("userId", userId, "eventId", eventId),
-                updateRequest
+                request
         );
     }
 
-    public ResponseEntity<Object> getRequestsForEvent(Long userId, Long eventId) {
+    public ResponseEntity<Object> getRequestsForEvent(long userId, long eventId) {
         return get(
                 "/users/{userId}/events/{eventId}/requests",
                 userId,
@@ -103,21 +99,57 @@ public class EventClient extends BaseClient {
     }
 
     public ResponseEntity<Object> updateRequestStatus(
-            Long userId,
-            Long eventId,
-            EventRequestStatusUpdateRequest statusUpdateRequest
-    ) {
+            long userId,
+            long eventId,
+            EventRequestStatusUpdateRequest request) {
         return patch(
                 "/users/{userId}/events/{eventId}/requests",
                 userId,
                 Map.of("userId", userId, "eventId", eventId),
-                statusUpdateRequest
+                request
+        );
+    }
+
+    public ResponseEntity<Object> searchEventsAdmin(List<Long> users,
+                                                    List<String> states,
+                                                    List<Long> categories,
+                                                    String rangeStart,
+                                                    String rangeEnd,
+                                                    int from,
+                                                    int size) {
+        UriComponentsBuilder uri = UriComponentsBuilder
+                .fromPath("/admin/events")
+                .queryParam("from", from)
+                .queryParam("size", size);
+
+        addListQueryParam(uri, "users", users);
+        addListQueryParam(uri, "states", states);
+        addListQueryParam(uri, "categories", categories);
+        addQueryParam(uri, "rangeStart", rangeStart);
+        addQueryParam(uri, "rangeEnd", rangeEnd);
+
+        return get(uri.build().toUriString());
+    }
+
+    public ResponseEntity<Object> updateEventAdmin(long eventId,
+                                                   UpdateEventAdminRequest request) {
+        return patch(
+                "/admin/events/{eventId}",
+                null,
+                Map.of("eventId", eventId),
+                request
         );
     }
 
     private void addQueryParam(UriComponentsBuilder uri, String name, Object value) {
         if (value != null) {
             uri.queryParam(name, value);
+        }
+    }
+
+    private void addListQueryParam(UriComponentsBuilder uri, String name, List<?> values) {
+        if (values != null && !values.isEmpty()) {
+            uri.queryParam(name, values.toArray());
         }
     }
 }

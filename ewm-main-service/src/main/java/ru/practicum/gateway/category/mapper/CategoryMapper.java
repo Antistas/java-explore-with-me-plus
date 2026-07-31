@@ -1,6 +1,7 @@
 package ru.practicum.gateway.category.mapper;
 
 import ru.practicum.gateway.category.dto.CategoryDto;
+import ru.practicum.gateway.category.dto.NewCategoryDto;
 import ru.practicum.gateway.category.model.Category;
 
 public class CategoryMapper {
@@ -16,13 +17,12 @@ public class CategoryMapper {
                 .build();
     }
 
-    public static Category toEntity(CategoryDto dto) {
+    public static Category toEntity(NewCategoryDto dto) {
         if (dto == null) {
             return null;
         }
 
         return Category.builder()
-                .id(dto.getId())
                 .name(dto.getName())
                 .build();
     }

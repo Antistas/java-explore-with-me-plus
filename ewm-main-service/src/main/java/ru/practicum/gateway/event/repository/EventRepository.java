@@ -2,6 +2,7 @@ package ru.practicum.gateway.event.repository;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.gateway.event.model.Event;
@@ -12,7 +13,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface EventRepository extends JpaRepository<Event, Long> {
+public interface EventRepository extends JpaRepository<Event, Long>, JpaSpecificationExecutor<Event> {
+
     List<Event> findAllByInitiatorId(Long userId, Pageable pageable);
 
     Optional<Event> findByIdAndInitiatorId(Long eventId, Long userId);
@@ -20,6 +22,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByState(EventState state);
 
     Optional<Event> findByIdAndState(Long id, EventState state);
+
+    boolean existsByCategoryId(Long categoryId);
 
     @Query("""
             SELECT e
