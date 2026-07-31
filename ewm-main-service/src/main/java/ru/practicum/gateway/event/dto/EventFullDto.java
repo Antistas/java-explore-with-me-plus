@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.gateway.category.dto.CategoryDto;
-import ru.practicum.gateway.event.EventState;
+import ru.practicum.gateway.event.model.EventState;
 import ru.practicum.gateway.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
