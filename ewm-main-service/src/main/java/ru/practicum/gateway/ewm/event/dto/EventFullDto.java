@@ -1,5 +1,7 @@
 package ru.practicum.gateway.ewm.event.dto;
 
+import ru.practicum.gateway.ewm.category.dto.CategoryDto;
+
 public record EventFullDto(
         Long id,
         String annotation,

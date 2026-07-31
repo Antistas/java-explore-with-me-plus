@@ -22,4 +22,15 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now().format(FORMATTER)
         );
     }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleConflict(ConflictException exception) {
+        return new ApiError(
+                HttpStatus.CONFLICT.name(),
+                "Integrity constraint has been violated.", // Согласно спецификации API
+                exception.getMessage(),
+                LocalDateTime.now().format(FORMATTER)
+        );
+    }
 }

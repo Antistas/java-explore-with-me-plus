@@ -153,10 +153,10 @@ public class EventController {
             @RequestParam(defaultValue = "0") @Min(0) int from,
             @RequestParam(defaultValue = "10") @Min(1) int size) {
 
-        log.info("Gateway stub: GET /admin/events | users={}, states={}, categories={}, rangeStart={}, rangeEnd={}, from={}, size={}",
+        log.info("Gateway: GET /admin/events | users={}, states={}, categories={}, rangeStart={}, rangeEnd={}, from={}, size={}",
                 users, states, categories, rangeStart, rangeEnd, from, size);
 
-        return ResponseEntity.ok().build();
+        return eventClient.searchEventsAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PatchMapping("/admin/events/{eventId}")
@@ -164,7 +164,7 @@ public class EventController {
             @PathVariable Long eventId,
             @RequestBody @Valid UpdateEventAdminRequest adminUpdateRequest) {
 
-        log.info("Gateway stub: PATCH /admin/events/{} | body: {}", eventId, adminUpdateRequest);
-        return ResponseEntity.ok().build();
+        log.info("Gateway: PATCH /admin/events/{} | body: {}", eventId, adminUpdateRequest);
+        return eventClient.updateEventAdmin(eventId, adminUpdateRequest);
     }
 }

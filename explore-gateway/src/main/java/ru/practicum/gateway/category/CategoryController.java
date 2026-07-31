@@ -2,6 +2,7 @@ package ru.practicum.gateway.category;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.gateway.category.dto.CategoryDto;
 import ru.practicum.gateway.category.dto.NewCategoryDto;
 
+@AllArgsConstructor
 @RestController
 @Slf4j
 @Validated
 public class CategoryController {
+
+    private final CategoryClient categoryClient;
 
     // 1. PUBLIC API (Доступно всем)
     @GetMapping("/categories")
@@ -41,14 +45,14 @@ public class CategoryController {
     // 2. ADMIN API (Только для администраторов)
     @PostMapping("/admin/categories")
     public ResponseEntity<Object> addCategoryAdmin(@RequestBody @Valid NewCategoryDto categoryDto) {
-        log.info("Gateway stub: POST /admin/categories | body: {}", categoryDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        log.info("Gateway: POST /admin/categories | body: {}", categoryDto);
+        return categoryClient.addCategory(categoryDto);
     }
 
     @DeleteMapping("/admin/categories/{catId}")
     public ResponseEntity<Object> deleteCategoryAdmin(@PathVariable Long catId) {
-        log.info("Gateway stub: DELETE /admin/categories/{}", catId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        log.info("Gateway: DELETE /admin/categories/{}", catId);
+        return categoryClient.deleteCategory(catId);
     }
 
     @PatchMapping("/admin/categories/{catId}")
@@ -56,7 +60,7 @@ public class CategoryController {
             @PathVariable Long catId,
             @RequestBody @Valid CategoryDto categoryDto) {
 
-        log.info("Gateway stub: PATCH /admin/categories/{} | body: {}", catId, categoryDto);
-        return ResponseEntity.ok().build();
+        log.info("Gateway: PATCH /admin/categories/{} | body: {}", catId, categoryDto);
+        return categoryClient.updateCategory(catId, categoryDto);
     }
 }

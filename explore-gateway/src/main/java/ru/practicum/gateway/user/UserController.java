@@ -2,6 +2,7 @@ package ru.practicum.gateway.user;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,11 @@ import java.util.List;
 @RestController
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class UserController {
+
+    private final UserClient userClient;
+
     @GetMapping("/admin/users")
     public ResponseEntity<Object> getUsersAdmin(
             @RequestParam(required = false) List<Long> ids,
@@ -27,18 +32,18 @@ public class UserController {
             @RequestParam(defaultValue = "10") @Min(1) int size) {
 
         log.info("Gateway stub: GET /admin/users | ids={}, from={}, size={}", ids, from, size);
-        return ResponseEntity.ok().build();
+        return userClient.getUsers(ids, from, size);
     }
 
     @PostMapping("/admin/users")
     public ResponseEntity<Object> registerUserAdmin(@RequestBody @Valid NewUserRequest userRequest) {
         log.info("Gateway stub: POST /admin/users | body: {}", userRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return userClient.addUser(userRequest);
     }
 
     @DeleteMapping("/admin/users/{userId}")
     public ResponseEntity<Object> deleteUserAdmin(@PathVariable Long userId) {
         log.info("Gateway stub: DELETE /admin/users/{}", userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return userClient.deleteUser(userId);
     }
 }

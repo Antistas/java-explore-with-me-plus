@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.gateway.client.BaseClient;
+import ru.practicum.gateway.event.dto.UpdateEventAdminRequest;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,5 +60,34 @@ public class EventClient extends BaseClient {
             path.append('&').append(name).append("={").append(name).append('}');
             parameters.put(name, value);
         }
+    }
+
+    public ResponseEntity<Object> searchEventsAdmin(
+            List<Long> users,
+            List<String> states,
+            List<Long> categories,
+            String rangeStart,
+            String rangeEnd,
+            int from,
+            int size) {
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("from", from);
+        parameters.put("size", size);
+
+        StringBuilder path = new StringBuilder("/admin/events?from={from}&size={size}");
+
+        addParameter(path, parameters, "users", users);
+        addParameter(path, parameters, "states", states);
+        addParameter(path, parameters, "categories", categories);
+        addParameter(path, parameters, "rangeStart", rangeStart);
+        addParameter(path, parameters, "rangeEnd", rangeEnd);
+
+        return get(path.toString(), null, parameters);
+    }
+
+
+    public ResponseEntity<Object> updateEventAdmin(Long eventId, UpdateEventAdminRequest request) {
+        return patch("/admin/events/" + eventId, request);
     }
 }
