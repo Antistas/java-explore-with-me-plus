@@ -95,7 +95,7 @@ public class AdminEventService {
         EventMapper.updateEventFromAdminRequest(event, request, category);
         LocalDateTime now = LocalDateTime.now();
         if (request.getEventDate() != null && event.getEventDate().isBefore(now.plusHours(1))) {
-            throw new ConflictException(
+            throw new BadRequestException(
                     "Event date must be at least one hour after publication");
         }
 

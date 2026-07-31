@@ -75,7 +75,7 @@ public class PrivateEventService {
 
 
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new ConflictException("Event date must be at least 2 hours from now");
+            throw new BadRequestException("Event date must be at least 2 hours from now");
         }
 
         Event event = EventMapper.toEntity(newEventDto, category, initiator);
@@ -146,7 +146,7 @@ public class PrivateEventService {
 
 
         if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new ConflictException("Event date must be at least 2 hours from now");
+            throw new BadRequestException("Event date must be at least 2 hours from now");
         }
 
         Event updated = eventRepository.save(event);

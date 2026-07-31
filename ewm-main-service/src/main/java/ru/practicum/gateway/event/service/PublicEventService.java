@@ -41,7 +41,7 @@ public class PublicEventService {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final LocalDateTime STATS_BEGIN =
             LocalDateTime.of(2000, 1, 1, 0, 0);
-    private static final String PUBLIC_APP = "explore-gateway";
+    private static final String PUBLIC_APP = "ewm-main-service";
 
     private final EventRepository eventRepository;
     private final ParticipationRequestRepository requestRepository;
