@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +18,9 @@ import ru.practicum.gateway.event.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.gateway.event.dto.NewEventDto;
 import ru.practicum.gateway.event.dto.UpdateEventAdminRequest;
 import ru.practicum.gateway.event.dto.UpdateEventUserRequest;
-import ru.practicum.gateway.stat.StatsClient;
-import ru.practicum.gateway.stat.dto.EndpointHitDto;
+import ru.practicum.stats.client.StatsClient;
+import ru.practicum.stats.dto.EndpointHit;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -58,7 +58,7 @@ public class EventController {
             @RequestParam(defaultValue = "10") @Min(1) int size,
             HttpServletRequest request) {
 
-        log.info("Gateway stub: GET /events | text={}, categories={}, paid={}, rangeStart={}, rangeEnd={}, onlyAvailable={}, sort={}, from={}, size={}",
+        log.info("Gateway: GET /events | text={}, categories={}, paid={}, rangeStart={}, rangeEnd={}, onlyAvailable={}, sort={}, from={}, size={}",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
 
         saveHit(request);
@@ -68,13 +68,13 @@ public class EventController {
     @GetMapping("/events/{id}")
     public ResponseEntity<Object> getEventByIdPublic(@PathVariable Long id,
                                                      HttpServletRequest request) {
-        log.info("Gateway stub: GET /events/{}", id);
+        log.info("Gateway: GET /events/{}", id);
         saveHit(request);
         return eventClient.getEvent(id);
     }
 
     private void saveHit(HttpServletRequest request) {
-        EndpointHitDto hit = EndpointHitDto.builder()
+        EndpointHit hit = EndpointHit.builder()
                 .app(applicationName)
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
@@ -91,17 +91,17 @@ public class EventController {
             @RequestParam(defaultValue = "0") @Min(0) int from,
             @RequestParam(defaultValue = "10") @Min(1) int size) {
 
-        log.info("Gateway stub: GET /users/{}/events | from={}, size={}", userId, from, size);
-        return ResponseEntity.ok().build();
+        log.info("GET /users/{}/events | from={}, size={}", userId, from, size);
+        return eventClient.getEventsByUser(userId, from, size);
     }
 
     @PostMapping("/users/{userId}/events")
     public ResponseEntity<Object> addEventPrivate(
             @PathVariable Long userId,
-            @RequestBody @Valid NewEventDto eventDto) {
+            @Valid @RequestBody NewEventDto eventDto) {
 
-        log.info("Gateway stub: POST /users/{}/events | body: {}", userId, eventDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        log.info("POST /users/{}/events | body: {}", userId, eventDto);
+        return eventClient.addEvent(userId, eventDto);
     }
 
     @GetMapping("/users/{userId}/events/{eventId}")
@@ -109,18 +109,18 @@ public class EventController {
             @PathVariable Long userId,
             @PathVariable Long eventId) {
 
-        log.info("Gateway stub: GET /users/{}/events/{}", userId, eventId);
-        return ResponseEntity.ok().build();
+        log.info("GET /users/{}/events/{}", userId, eventId);
+        return eventClient.getEventByUser(userId, eventId);
     }
 
     @PatchMapping("/users/{userId}/events/{eventId}")
     public ResponseEntity<Object> updateEventPrivate(
             @PathVariable Long userId,
             @PathVariable Long eventId,
-            @RequestBody @Valid UpdateEventUserRequest updateRequest) {
+            @Valid @RequestBody UpdateEventUserRequest updateRequest) {
 
-        log.info("Gateway stub: PATCH /users/{}/events/{} | body: {}", userId, eventId, updateRequest);
-        return ResponseEntity.ok().build();
+        log.info("PATCH /users/{}/events/{} | body: {}", userId, eventId, updateRequest);
+        return eventClient.updateEventByUser(userId, eventId, updateRequest);
     }
 
     @GetMapping("/users/{userId}/events/{eventId}/requests")
@@ -128,18 +128,18 @@ public class EventController {
             @PathVariable Long userId,
             @PathVariable Long eventId) {
 
-        log.info("Gateway stub: GET /users/{}/events/{}/requests", userId, eventId);
-        return ResponseEntity.ok().build();
+        log.info("GET /users/{}/events/{}/requests", userId, eventId);
+        return eventClient.getRequestsForEvent(userId, eventId);
     }
 
     @PatchMapping("/users/{userId}/events/{eventId}/requests")
     public ResponseEntity<Object> updateRequestStatusPrivate(
             @PathVariable Long userId,
             @PathVariable Long eventId,
-            @RequestBody @Valid EventRequestStatusUpdateRequest statusUpdateRequest) {
+            @Valid @RequestBody EventRequestStatusUpdateRequest statusUpdateRequest) {
 
-        log.info("Gateway stub: PATCH /users/{}/events/{}/requests | body: {}", userId, eventId, statusUpdateRequest);
-        return ResponseEntity.ok().build();
+        log.info("PATCH /users/{}/events/{}/requests | body: {}", userId, eventId, statusUpdateRequest);
+        return eventClient.updateRequestStatus(userId, eventId, statusUpdateRequest);
     }
 
     // 3. ADMIN API (Для администраторов)
@@ -153,10 +153,11 @@ public class EventController {
             @RequestParam(defaultValue = "0") @Min(0) int from,
             @RequestParam(defaultValue = "10") @Min(1) int size) {
 
-        log.info("Gateway stub: GET /admin/events | users={}, states={}, categories={}, rangeStart={}, rangeEnd={}, from={}, size={}",
+        log.info("Gateway: GET /admin/events | users={}, states={}, categories={}, rangeStart={}, rangeEnd={}, from={}, size={}",
                 users, states, categories, rangeStart, rangeEnd, from, size);
 
-        return ResponseEntity.ok().build();
+        return eventClient.searchEventsAdmin(
+                users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PatchMapping("/admin/events/{eventId}")
@@ -164,7 +165,7 @@ public class EventController {
             @PathVariable Long eventId,
             @RequestBody @Valid UpdateEventAdminRequest adminUpdateRequest) {
 
-        log.info("Gateway stub: PATCH /admin/events/{} | body: {}", eventId, adminUpdateRequest);
-        return ResponseEntity.ok().build();
+        log.info("Gateway: PATCH /admin/events/{} | body: {}", eventId, adminUpdateRequest);
+        return eventClient.updateEventAdmin(eventId, adminUpdateRequest);
     }
 }

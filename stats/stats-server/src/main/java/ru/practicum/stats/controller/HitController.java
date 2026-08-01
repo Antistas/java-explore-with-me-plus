@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.stats.dto.EndpointHit;
 import ru.practicum.stats.dto.ViewStats;
 import ru.practicum.stats.service.StatsService;
@@ -37,6 +38,10 @@ public class HitController {
             @RequestParam(defaultValue = "false") Boolean unique) {
         LocalDateTime startDateTime = parseStart(start);
         LocalDateTime endDateTime = parseEnd(end);
+
+        if (startDateTime.isAfter(endDateTime)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start date must not be after end date");
+        }
 
         log.info("Get stats: start={}, end={}, uris={}, unique={}",
                 startDateTime, endDateTime, uris, unique);

@@ -5,8 +5,13 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.gateway.client.BaseClient;
-import java.util.HashMap;
+import ru.practicum.gateway.event.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.gateway.event.dto.NewEventDto;
+import ru.practicum.gateway.event.dto.UpdateEventAdminRequest;
+import ru.practicum.gateway.event.dto.UpdateEventUserRequest;
+
 import java.util.List;
 import java.util.Map;
 
@@ -29,34 +34,122 @@ public class EventClient extends BaseClient {
                                             String sort,
                                             int from,
                                             int size) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("onlyAvailable", onlyAvailable);
-        parameters.put("from", from);
-        parameters.put("size", size);
+        UriComponentsBuilder uri = UriComponentsBuilder
+                .fromPath("/events")
+                .queryParam("onlyAvailable", onlyAvailable)
+                .queryParam("from", from)
+                .queryParam("size", size);
 
-        StringBuilder path = new StringBuilder("/events?onlyAvailable={onlyAvailable}&from={from}&size={size}");
+        addQueryParam(uri, "text", text);
+        addQueryParam(uri, "paid", paid);
+        addQueryParam(uri, "rangeStart", rangeStart);
+        addQueryParam(uri, "rangeEnd", rangeEnd);
+        addQueryParam(uri, "sort", sort);
+        addListQueryParam(uri, "categories", categories);
 
-        addParameter(path, parameters, "text", text);
-        addParameter(path, parameters, "categories", categories);
-        addParameter(path, parameters, "paid", paid);
-        addParameter(path, parameters, "rangeStart", rangeStart);
-        addParameter(path, parameters, "rangeEnd", rangeEnd);
-        addParameter(path, parameters, "sort", sort);
-
-        return get(path.toString(), null, parameters);
+        return get(uri.build().toUriString());
     }
 
     public ResponseEntity<Object> getEvent(long eventId) {
         return get("/events/{eventId}", null, Map.of("eventId", eventId));
     }
 
-    private void addParameter(StringBuilder path,
-                              Map<String, Object> parameters,
-                              String name,
-                              Object value) {
+    public ResponseEntity<Object> getEventsByUser(long userId, int from, int size) {
+        return get(
+                "/users/{userId}/events?from={from}&size={size}",
+                userId,
+                Map.of("userId", userId, "from", from, "size", size)
+        );
+    }
+
+    public ResponseEntity<Object> addEvent(long userId, NewEventDto eventDto) {
+        return post(
+                "/users/{userId}/events",
+                userId,
+                Map.of("userId", userId),
+                eventDto
+        );
+    }
+
+    public ResponseEntity<Object> getEventByUser(long userId, long eventId) {
+        return get(
+                "/users/{userId}/events/{eventId}",
+                userId,
+                Map.of("userId", userId, "eventId", eventId)
+        );
+    }
+
+    public ResponseEntity<Object> updateEventByUser(long userId,
+                                                    long eventId,
+                                                    UpdateEventUserRequest request) {
+        return patch(
+                "/users/{userId}/events/{eventId}",
+                userId,
+                Map.of("userId", userId, "eventId", eventId),
+                request
+        );
+    }
+
+    public ResponseEntity<Object> getRequestsForEvent(long userId, long eventId) {
+        return get(
+                "/users/{userId}/events/{eventId}/requests",
+                userId,
+                Map.of("userId", userId, "eventId", eventId)
+        );
+    }
+
+    public ResponseEntity<Object> updateRequestStatus(
+            long userId,
+            long eventId,
+            EventRequestStatusUpdateRequest request) {
+        return patch(
+                "/users/{userId}/events/{eventId}/requests",
+                userId,
+                Map.of("userId", userId, "eventId", eventId),
+                request
+        );
+    }
+
+    public ResponseEntity<Object> searchEventsAdmin(List<Long> users,
+                                                    List<String> states,
+                                                    List<Long> categories,
+                                                    String rangeStart,
+                                                    String rangeEnd,
+                                                    int from,
+                                                    int size) {
+        UriComponentsBuilder uri = UriComponentsBuilder
+                .fromPath("/admin/events")
+                .queryParam("from", from)
+                .queryParam("size", size);
+
+        addListQueryParam(uri, "users", users);
+        addListQueryParam(uri, "states", states);
+        addListQueryParam(uri, "categories", categories);
+        addQueryParam(uri, "rangeStart", rangeStart);
+        addQueryParam(uri, "rangeEnd", rangeEnd);
+
+        return get(uri.build().toUriString());
+    }
+
+    public ResponseEntity<Object> updateEventAdmin(long eventId,
+                                                   UpdateEventAdminRequest request) {
+        return patch(
+                "/admin/events/{eventId}",
+                null,
+                Map.of("eventId", eventId),
+                request
+        );
+    }
+
+    private void addQueryParam(UriComponentsBuilder uri, String name, Object value) {
         if (value != null) {
-            path.append('&').append(name).append("={").append(name).append('}');
-            parameters.put(name, value);
+            uri.queryParam(name, value);
+        }
+    }
+
+    private void addListQueryParam(UriComponentsBuilder uri, String name, List<?> values) {
+        if (values != null && !values.isEmpty()) {
+            uri.queryParam(name, values.toArray());
         }
     }
 }
