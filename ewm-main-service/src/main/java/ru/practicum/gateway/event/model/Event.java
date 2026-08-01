@@ -1,10 +1,7 @@
 package ru.practicum.gateway.event.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.gateway.category.model.Category;
 import ru.practicum.gateway.user.model.User;
 
@@ -12,7 +9,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "events")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

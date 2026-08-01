@@ -22,12 +22,14 @@ import ru.practicum.gateway.request.mapper.RequestMapper;
 import ru.practicum.gateway.request.model.ParticipationRequest;
 import ru.practicum.gateway.request.model.RequestStatus;
 import ru.practicum.gateway.request.repository.ParticipationRequestRepository;
+import ru.practicum.gateway.request.repository.EventRequestsCount;
 import ru.practicum.gateway.user.model.User;
 import ru.practicum.gateway.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,13 +53,12 @@ public class PrivateEventService {
 
         Pageable pageable = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findAllByInitiatorId(userId, pageable);
+        Map<Long, Long> confirmedRequests = getConfirmedRequests(events);
 
         return events.stream()
                 .map(event -> {
-                    long confirmedRequests = requestRepository.countByEventIdAndStatus(
-                            event.getId(), RequestStatus.CONFIRMED);
                     EventShortDto dto = EventMapper.toEventShortDto(event);
-                    dto.setConfirmedRequests(confirmedRequests);
+                    dto.setConfirmedRequests(confirmedRequests.getOrDefault(event.getId(), 0L));
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -249,5 +250,22 @@ public class PrivateEventService {
     private Category checkCategoryExists(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NotFoundException("Category with id " + categoryId + " not found"));
+    }
+
+    private Map<Long, Long> getConfirmedRequests(List<Event> events) {
+        if (events.isEmpty()) {
+            return Map.of();
+        }
+
+        List<Long> eventIds = events.stream()
+                .map(Event::getId)
+                .toList();
+
+        return requestRepository.countByEventIdsAndStatus(eventIds, RequestStatus.CONFIRMED)
+                .stream()
+                .collect(Collectors.toMap(
+                        EventRequestsCount::getEventId,
+                        EventRequestsCount::getConfirmedRequests
+                ));
     }
 }
