@@ -1,44 +1,41 @@
 package ru.practicum.gateway.request;
 
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class RequestController {
 
-    @GetMapping("/users/{userId}/requests")
-    public ResponseEntity<Object> getUserRequestsPrivate(@PathVariable Long userId) {
-        log.info("Gateway stub: GET /users/{}/requests", userId);
-        return ResponseEntity.ok().build();
-    }
+    private final RequestClient requestClient;
 
+    //авторизованый пользователь
+    @GetMapping("/users/{userId}/requests")
+    public ResponseEntity<Object> getUserRequestsPrivate(
+            @PathVariable @Positive Long userId) {
+        log.info("GET /users/{}/requests - получение заявок пользователя", userId);
+        return requestClient.getUserRequests(userId);
+    }
 
     @PostMapping("/users/{userId}/requests")
     public ResponseEntity<Object> addParticipationRequestPrivate(
-            @PathVariable Long userId,
-            @RequestParam Long eventId) {
-
-        log.info("Gateway stub: POST /users/{}/requests | eventId={}", userId, eventId);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+            @PathVariable @Positive Long userId,
+            @RequestParam @Positive Long eventId) {
+        log.info("POST /users/{}/requests?eventId={} - создание заявки на участие", userId, eventId);
+        return requestClient.addParticipationRequest(userId, eventId);
     }
-
 
     @PatchMapping("/users/{userId}/requests/{requestId}/cancel")
     public ResponseEntity<Object> cancelRequestPrivate(
-            @PathVariable Long userId,
-            @PathVariable Long requestId) {
-
-        log.info("Gateway stub: PATCH /users/{}/requests/{}/cancel", userId, requestId);
-        return ResponseEntity.ok().build();
+            @PathVariable @Positive Long userId,
+            @PathVariable @Positive Long requestId) {
+        log.info("PATCH /users/{}/requests/{}/cancel - отмена заявки", userId, requestId);
+        return requestClient.cancelRequest(userId, requestId);
     }
 }
