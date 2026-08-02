@@ -17,6 +17,7 @@ import ru.practicum.gateway.exception.BadRequestException;
 import ru.practicum.gateway.exception.NotFoundException;
 import ru.practicum.gateway.request.model.RequestStatus;
 import ru.practicum.gateway.request.repository.ParticipationRequestRepository;
+import ru.practicum.gateway.rating.service.EventRatingService;
 import ru.practicum.gateway.util.OffsetPageRequest;
 import ru.practicum.stats.client.StatsClient;
 import ru.practicum.stats.dto.ViewStats;
@@ -46,6 +47,7 @@ public class PublicEventService {
     private final EventRepository eventRepository;
     private final ParticipationRequestRepository requestRepository;
     private final StatsClient statsClient;
+    private final EventRatingService ratingService;
 
     public enum EventSort {
         EVENT_DATE,
@@ -122,8 +124,10 @@ public class PublicEventService {
             events = page(events, from, size);
         }
 
+        Map<Long, Long> ratings = ratingService.getRatings(events);
         return events.stream()
-                .map(event -> toShortDto(event, views.getOrDefault(event.getId(), 0L)))
+                .map(event -> toShortDto(event, views.getOrDefault(event.getId(), 0L),
+                        ratings.getOrDefault(event.getId(), 0L)))
                 .toList();
     }
 
@@ -133,27 +137,31 @@ public class PublicEventService {
                         "Event id=" + eventId + " was not found"));
 
         long views = loadViewsSafely(List.of(event)).getOrDefault(eventId, 0L);
-        return toFullDto(event, views);
+        return toFullDto(event, views, ratingService.getRating(eventId));
     }
 
     public List<EventShortDto> toShortDtos(List<Event> events) {
         Map<Long, Long> views = loadViewsSafely(events);
+        Map<Long, Long> ratings = ratingService.getRatings(events);
         return events.stream()
-                .map(event -> toShortDto(event, views.getOrDefault(event.getId(), 0L)))
+                .map(event -> toShortDto(event, views.getOrDefault(event.getId(), 0L),
+                        ratings.getOrDefault(event.getId(), 0L)))
                 .toList();
     }
 
-    private EventShortDto toShortDto(Event event, long views) {
+    private EventShortDto toShortDto(Event event, long views, long rating) {
         EventShortDto dto = EventMapper.toEventShortDto(event);
         dto.setConfirmedRequests(confirmedRequests(event.getId()));
         dto.setViews(views);
+        dto.setRating(rating);
         return dto;
     }
 
-    private EventFullDto toFullDto(Event event, long views) {
+    private EventFullDto toFullDto(Event event, long views, long rating) {
         EventFullDto dto = EventMapper.toEventFullDto(event);
         dto.setConfirmedRequests(confirmedRequests(event.getId()));
         dto.setViews(views);
+        dto.setRating(rating);
         return dto;
     }
 
