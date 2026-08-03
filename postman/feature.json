@@ -1,0 +1,1430 @@
+{
+  "info": {
+    "name": "ExploreWithMe - Public API + Ratings",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Подготовка тестовых данных",
+      "item": [
+        {
+          "name": "01. Создать пользователя",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"runToken\",Date.now().toString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 201\",()=>pm.response.to.have.status(201));",
+                  "var b=pm.response.json();",
+                  "pm.expect(b).to.include.all.keys(\"id\",\"name\",\"email\");",
+                  "pm.collectionVariables.set(\"userId\",b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "Content-Type": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Postman User {{runToken}}\",\"email\":\"postman.{{runToken}}@example.com\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/admin/users"
+          },
+          "response": []
+        },
+        {
+          "name": "02. Создать категорию",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 201\",()=>pm.response.to.have.status(201));",
+                  "var b=pm.response.json();",
+                  "pm.expect(b).to.include.all.keys(\"id\",\"name\");",
+                  "pm.collectionVariables.set(\"categoryId\",b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "Content-Type": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"Postman {{runToken}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/admin/categories"
+          },
+          "response": []
+        },
+        {
+          "name": "03. Создать платное событие",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 201\",()=>pm.response.to.have.status(201));",
+                  "var b=pm.response.json();",
+                  "pm.expect(b.state).to.eql(\"PENDING\");",
+                  "pm.collectionVariables.set(\"eventId\",b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "Content-Type": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"annotation\":\"postmanfilter{{runToken}} платное тестовое событие\",\"category\":{{categoryId}},\"description\":\"Подробное описание платного события для автоматических Postman тестов.\",\"eventDate\":\"2099-06-15 19:00:00\",\"location\":{\"lat\":55.75,\"lon\":37.61},\"paid\":true,\"participantLimit\":20,\"requestModeration\":true,\"title\":\"Postman Paid {{runToken}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/users/{{userId}}/events"
+          },
+          "response": []
+        },
+        {
+          "name": "04. Опубликовать платное событие",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().state).to.eql(\"PUBLISHED\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "Content-Type": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"stateAction\":\"PUBLISH_EVENT\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/admin/events/{{eventId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "05. Создать бесплатное событие",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 201\",()=>pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"freeEventId\",pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "Content-Type": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"annotation\":\"postmansecond{{runToken}} бесплатное тестовое событие\",\"category\":{{categoryId}},\"description\":\"Подробное описание бесплатного события для автоматических Postman тестов.\",\"eventDate\":\"2099-09-20 12:00:00\",\"location\":{\"lat\":59.93,\"lon\":30.31},\"paid\":false,\"participantLimit\":0,\"requestModeration\":false,\"title\":\"Postman Free {{runToken}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/users/{{userId}}/events"
+          },
+          "response": []
+        },
+        {
+          "name": "06. Опубликовать бесплатное событие",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "pm.expect(pm.response.json().state).to.eql(\"PUBLISHED\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "Content-Type": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"stateAction\":\"PUBLISH_EVENT\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/admin/events/{{freeEventId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "07. Создать закреплённую подборку",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 201\",()=>pm.response.to.have.status(201));",
+                  "var b=pm.response.json();",
+                  "pm.expect(b).to.include.all.keys(\"id\",\"events\",\"pinned\",\"title\");",
+                  "pm.collectionVariables.set(\"compilationId\",b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "Content-Type": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"events\":[{{eventId}},{{freeEventId}}],\"pinned\":true,\"title\":\"Postman {{runToken}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/admin/compilations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public API",
+      "item": [
+        {
+          "name": "GET /events",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
+                  "function checkEvent(e) {",
+                  "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
+                  "pm.expect(e.id).to.be.a(\"number\");",
+                  "pm.expect(e.annotation).to.be.a(\"string\");",
+                  "pm.expect(e.category).to.include.all.keys(\"id\",\"name\");",
+                  "pm.expect(e.eventDate).to.be.a(\"string\");",
+                  "pm.expect(e.initiator).to.include.all.keys(\"id\",\"name\");",
+                  "pm.expect(e.paid).to.be.a(\"boolean\");",
+                  "pm.expect(e.confirmedRequests).to.be.a(\"number\");",
+                  "pm.expect(e.views).to.be.a(\"number\");",
+                  "pm.expect(e.rating).to.be.a(\"number\");",
+                  "}",
+                  "pm.test(\"Поля событий\",()=>data.forEach(checkEvent));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?from=0&size=50"
+          },
+          "response": []
+        },
+        {
+          "name": "Фильтр text",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
+                  "function checkEvent(e) {",
+                  "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
+                  "pm.expect(e.id).to.be.a(\"number\");",
+                  "pm.expect(e.annotation).to.be.a(\"string\");",
+                  "pm.expect(e.category).to.include.all.keys(\"id\",\"name\");",
+                  "pm.expect(e.eventDate).to.be.a(\"string\");",
+                  "pm.expect(e.initiator).to.include.all.keys(\"id\",\"name\");",
+                  "pm.expect(e.paid).to.be.a(\"boolean\");",
+                  "pm.expect(e.confirmedRequests).to.be.a(\"number\");",
+                  "pm.expect(e.views).to.be.a(\"number\");",
+                  "pm.expect(e.rating).to.be.a(\"number\");",
+                  "}",
+                  "pm.test(\"Текстовый фильтр\",()=> {",
+                  "pm.expect(data.length).to.be.greaterThan(0);",
+                  "data.forEach(checkEvent);",
+                  "pm.expect(data.some(e=>e.id===Number(pm.collectionVariables.get(\"eventId\")))).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?text=postmanfilter{{runToken}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Фильтр categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
+                  "pm.test(\"Категория\",()=> {",
+                  "pm.expect(data.length).to.be.greaterThan(0);",
+                  "data.forEach(e=>pm.expect(e.category.id).to.eql(Number(pm.collectionVariables.get(\"categoryId\"))));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?categories={{categoryId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Фильтр paid=true",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
+                  "pm.test(\"Только платные\",()=> {",
+                  "pm.expect(data.length).to.be.greaterThan(0);",
+                  "data.forEach(e=>pm.expect(e.paid).to.be.true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?text=postman&paid=true"
+          },
+          "response": []
+        },
+        {
+          "name": "Фильтр paid=false",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
+                  "pm.test(\"Только бесплатные\",()=> {",
+                  "pm.expect(data.length).to.be.greaterThan(0);",
+                  "data.forEach(e=>pm.expect(e.paid).to.be.false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?text=postman&paid=false"
+          },
+          "response": []
+        },
+        {
+          "name": "Диапазон дат без времени",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
+                  "pm.test(\"Диапазон дат\",()=> {",
+                  "pm.expect(data.map(e=>e.id)).to.include(Number(pm.collectionVariables.get(\"eventId\")));",
+                  "data.forEach(e=> {",
+                  "    const t=new Date(e.eventDate.replace(\" \",\"T\")).getTime();",
+                  "    pm.expect(t).to.be.at.least(new Date(\"2099-06-01T00:00:00\").getTime());",
+                  "    pm.expect(t).to.be.at.most(new Date(\"2099-07-01T23:59:59\").getTime());",
+                  "});",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?categories={{categoryId}}&rangeStart=2099-06-01&rangeEnd=2099-07-01"
+          },
+          "response": []
+        },
+        {
+          "name": "Фильтр onlyAvailable",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
+                  "pm.test(\"Доступные события\",()=> {",
+                  "const ids=data.map(e=>e.id);",
+                  "pm.expect(ids).to.include(Number(pm.collectionVariables.get(\"eventId\")));",
+                  "pm.expect(ids).to.include(Number(pm.collectionVariables.get(\"freeEventId\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?categories={{categoryId}}&onlyAvailable=true"
+          },
+          "response": []
+        },
+        {
+          "name": "Сортировка EVENT_DATE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
+                  "pm.test(\"По возрастанию даты\",()=> {",
+                  "for(let i=1;",
+                  "i<data.length;",
+                  "i++) {",
+                  "    pm.expect(new Date(data[i-1].eventDate.replace(\" \",\"T\")).getTime()).to.be.at.most(new Date(data[i].eventDate.replace(\" \",\"T\")).getTime());",
+                  "}",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?categories={{categoryId}}&sort=EVENT_DATE"
+          },
+          "response": []
+        },
+        {
+          "name": "Сортировка VIEWS",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
+                  "pm.test(\"По убыванию просмотров\",()=> {",
+                  "for(let i=1;",
+                  "i<data.length;",
+                  "i++) {",
+                  "    pm.expect(data[i-1].views).to.be.at.least(data[i].views);",
+                  "}",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?categories={{categoryId}}&sort=VIEWS"
+          },
+          "response": []
+        },
+        {
+          "name": "Пагинация size=1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
+                  "pm.test(\"Размер страницы\",()=>pm.expect(data.length).to.be.at.most(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?categories={{categoryId}}&from=0&size=1"
+          },
+          "response": []
+        },
+        {
+          "name": "Комбинированные фильтры",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
+                  "function checkEvent(e) {",
+                  "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
+                  "pm.expect(e.id).to.be.a(\"number\");",
+                  "pm.expect(e.annotation).to.be.a(\"string\");",
+                  "pm.expect(e.category).to.include.all.keys(\"id\",\"name\");",
+                  "pm.expect(e.eventDate).to.be.a(\"string\");",
+                  "pm.expect(e.initiator).to.include.all.keys(\"id\",\"name\");",
+                  "pm.expect(e.paid).to.be.a(\"boolean\");",
+                  "pm.expect(e.confirmedRequests).to.be.a(\"number\");",
+                  "pm.expect(e.views).to.be.a(\"number\");",
+                  "pm.expect(e.rating).to.be.a(\"number\");",
+                  "}",
+                  "pm.test(\"Все фильтры\",()=> {",
+                  "pm.expect(data.length).to.eql(1);",
+                  "checkEvent(data[0]);",
+                  "pm.expect(data[0].id).to.eql(Number(pm.collectionVariables.get(\"eventId\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?text=postmanfilter{{runToken}}&categories={{categoryId}}&paid=true&rangeStart=2099-01-01&rangeEnd=2099-12-31&onlyAvailable=true&sort=EVENT_DATE&from=0&size=10"
+          },
+          "response": []
+        },
+        {
+          "name": "Неверная сортировка - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
+                  "var e=pm.response.json();",
+                  "pm.test(\"Структура ApiError\",()=> {",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");",
+                  "pm.expect(e.status).to.be.a(\"string\");",
+                  "pm.expect(e.reason).to.be.a(\"string\");",
+                  "pm.expect(e.message).to.be.a(\"string\");",
+                  "pm.expect(e.timestamp).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?sort=UNKNOWN"
+          },
+          "response": []
+        },
+        {
+          "name": "Неверная дата - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
+                  "var e=pm.response.json();",
+                  "pm.test(\"Структура ApiError\",()=> {",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");",
+                  "pm.expect(e.status).to.be.a(\"string\");",
+                  "pm.expect(e.reason).to.be.a(\"string\");",
+                  "pm.expect(e.message).to.be.a(\"string\");",
+                  "pm.expect(e.timestamp).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?rangeStart=not-a-date"
+          },
+          "response": []
+        },
+        {
+          "name": "Начало позже конца - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
+                  "var e=pm.response.json();",
+                  "pm.test(\"Структура ApiError\",()=> {",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");",
+                  "pm.expect(e.status).to.be.a(\"string\");",
+                  "pm.expect(e.reason).to.be.a(\"string\");",
+                  "pm.expect(e.message).to.be.a(\"string\");",
+                  "pm.expect(e.timestamp).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?rangeStart=2099-12-31&rangeEnd=2099-01-01"
+          },
+          "response": []
+        },
+        {
+          "name": "Отрицательный from - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\", () => pm.response.to.have.status(400));",
+                  "var e= pm.response.json();",
+                  "pm.test(\"Структура ApiError\", () => {",
+                  "pm.expect(e).to.include.all.keys(\"status\", \"reason\", \"message\", \"timestamp\");",
+                  "pm.expect(e.status).to.be.a(\"string\");",
+                  "pm.expect(e.reason).to.be.a(\"string\");",
+                  "pm.expect(e.message).to.be.a(\"string\");",
+                  "pm.expect(e.timestamp).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?from=-1"
+          },
+          "response": []
+        },
+        {
+          "name": "Нулевой size - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
+                  "var e=pm.response.json();",
+                  "pm.test(\"Структура ApiError\",()=> {",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");",
+                  "pm.expect(e.status).to.be.a(\"string\");",
+                  "pm.expect(e.reason).to.be.a(\"string\");",
+                  "pm.expect(e.message).to.be.a(\"string\");",
+                  "pm.expect(e.timestamp).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events?size=0"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /events/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var e=pm.response.json();",
+                  "function checkEvent(e) {",
+                  "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
+                  "pm.expect(e.id).to.be.a(\"number\");",
+                  "pm.expect(e.annotation).to.be.a(\"string\");",
+                  "pm.expect(e.category).to.include.all.keys(\"id\",\"name\");",
+                  "pm.expect(e.eventDate).to.be.a(\"string\");",
+                  "pm.expect(e.initiator).to.include.all.keys(\"id\",\"name\");",
+                  "pm.expect(e.paid).to.be.a(\"boolean\");",
+                  "pm.expect(e.confirmedRequests).to.be.a(\"number\");",
+                  "pm.expect(e.views).to.be.a(\"number\");",
+                  "pm.expect(e.rating).to.be.a(\"number\");",
+                  "}",
+                  "pm.test(\"Полный состав полей\",()=> {",
+                  "checkEvent(e);",
+                  "pm.expect(e).to.include.all.keys(\"description\",\"location\",\"participantLimit\",\"requestModeration\",\"state\",\"createdOn\",\"publishedOn\");",
+                  "pm.expect(e.description).to.be.a(\"string\");",
+                  "pm.expect(e.location).to.include.all.keys(\"lat\",\"lon\");",
+                  "pm.expect(e.participantLimit).to.be.a(\"number\");",
+                  "pm.expect(e.requestModeration).to.be.a(\"boolean\");",
+                  "pm.expect(e.state).to.eql(\"PUBLISHED\");",
+                  "});",
+                  "pm.collectionVariables.set(\"initialRating\",e.rating);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events/{{eventId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Несуществующее событие - 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404\",()=>pm.response.to.have.status(404));",
+                  "var e=pm.response.json();",
+                  "pm.test(\"Структура ApiError\",()=> {",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");",
+                  "pm.expect(e.status).to.be.a(\"string\");",
+                  "pm.expect(e.reason).to.be.a(\"string\");",
+                  "pm.expect(e.message).to.be.a(\"string\");",
+                  "pm.expect(e.timestamp).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events/900000000000"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - лайки / дизлайки",
+      "item": [
+        {
+          "name": "Поставить лайк",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 204\",()=>pm.response.to.have.status(204));",
+                  "pm.test(\"Пустое тело\",()=>pm.expect(pm.response.text()).to.eql(\"\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/user/{{userId}}/event/{{eventId}}/like"
+          },
+          "response": []
+        },
+        {
+          "name": "Рейтинг увеличился",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"rating + 1\",()=>pm.expect(pm.response.json().rating).to.eql(Number(pm.collectionVariables.get(\"initialRating\"))+1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events/{{eventId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Повторный лайк удаляет голос",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 204\",()=>pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/user/{{userId}}/event/{{eventId}}/like"
+          },
+          "response": []
+        },
+        {
+          "name": "После удаления лайка исходный рейтинг",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"Исходный рейтинг\",()=>pm.expect(pm.response.json().rating).to.eql(Number(pm.collectionVariables.get(\"initialRating\"))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events/{{eventId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Поставить дизлайк",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 204\",()=>pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/user/{{userId}}/event/{{eventId}}/dislike"
+          },
+          "response": []
+        },
+        {
+          "name": "Рейтинг уменьшился",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"rating - 1\",()=>pm.expect(pm.response.json().rating).to.eql(Number(pm.collectionVariables.get(\"initialRating\"))-1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events/{{eventId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Повторный дизлайк удаляет голос",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 204\",()=>pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/user/{{userId}}/event/{{eventId}}/dislike"
+          },
+          "response": []
+        },
+        {
+          "name": "После удаления дизлайка исходный рейтинг",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "pm.test(\"Исходный рейтинг\",()=>pm.expect(pm.response.json().rating).to.eql(Number(pm.collectionVariables.get(\"initialRating\"))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/events/{{eventId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Лайк неизвестного пользователя - 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404\",()=>pm.response.to.have.status(404));",
+                  "var e=pm.response.json();",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/user/900000000000/event/{{eventId}}/like"
+          },
+          "response": []
+        },
+        {
+          "name": "Дизлайк неизвестного события - 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404\",()=>pm.response.to.have.status(404));",
+                  "var e=pm.response.json();",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/user/{{userId}}/event/900000000000/dislike"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Public Compilations",
+      "item": [
+        {
+          "name": "GET /compilations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.expect(data).to.be.an(\"array\");",
+                  "function checkEvent(e) {",
+                  "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
+                  "pm.expect(e.rating).to.be.a(\"number\");",
+                  "}",
+                  "function checkCompilation(c) {",
+                  "pm.expect(c).to.include.all.keys(\"id\",\"events\",\"pinned\",\"title\");",
+                  "pm.expect(c.id).to.be.a(\"number\");",
+                  "pm.expect(c.events).to.be.an(\"array\");",
+                  "pm.expect(c.pinned).to.be.a(\"boolean\");",
+                  "pm.expect(c.title).to.be.a(\"string\");",
+                  "c.events.forEach(checkEvent);",
+                  "}",
+                  "pm.test(\"Поля подборок\",()=>data.forEach(checkCompilation));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/compilations?from=0&size=50"
+          },
+          "response": []
+        },
+        {
+          "name": "Фильтр pinned=true",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.expect(data).to.be.an(\"array\");",
+                  "pm.test(\"Только закреплённые\",()=> {",
+                  "pm.expect(data.length).to.be.greaterThan(0);",
+                  "data.forEach(c=>pm.expect(c.pinned).to.be.true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/compilations?pinned=true&from=0&size=50"
+          },
+          "response": []
+        },
+        {
+          "name": "Фильтр pinned=false",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.expect(data).to.be.an(\"array\");",
+                  "pm.test(\"Только незакреплённые\",()=>data.forEach(c=>pm.expect(c.pinned).to.be.false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/compilations?pinned=false&from=0&size=50"
+          },
+          "response": []
+        },
+        {
+          "name": "Пагинация size=1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.expect(data).to.be.an(\"array\");",
+                  "pm.test(\"Размер страницы\",()=>pm.expect(data.length).to.be.at.most(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/compilations?from=0&size=1"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /compilations/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "function checkEvent(e) {",
+                  "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
+                  "pm.expect(e.rating).to.be.a(\"number\");",
+                  "}",
+                  "function checkCompilation(c) {",
+                  "pm.expect(c).to.include.all.keys(\"id\",\"events\",\"pinned\",\"title\");",
+                  "pm.expect(c.id).to.be.a(\"number\");",
+                  "pm.expect(c.events).to.be.an(\"array\");",
+                  "pm.expect(c.pinned).to.be.a(\"boolean\");",
+                  "pm.expect(c.title).to.be.a(\"string\");",
+                  "c.events.forEach(checkEvent);",
+                  "}",
+                  "pm.test(\"Поля и события\",()=> {",
+                  "checkCompilation(data);",
+                  "const ids=data.events.map(e=>e.id);",
+                  "pm.expect(ids).to.include(Number(pm.collectionVariables.get(\"eventId\")));",
+                  "pm.expect(ids).to.include(Number(pm.collectionVariables.get(\"freeEventId\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/compilations/{{compilationId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Несуществующая подборка - 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404\",()=>pm.response.to.have.status(404));",
+                  "var e=pm.response.json();",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/compilations/900000000000"
+          },
+          "response": []
+        },
+        {
+          "name": "Отрицательный from - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
+                  "var e=pm.response.json();",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/compilations?from=-1"
+          },
+          "response": []
+        },
+        {
+          "name": "Нулевой size - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
+                  "var e=pm.response.json();",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/compilations?size=0"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - Categories",
+      "item": [
+        {
+          "name": "GET /categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.expect(data).to.be.an(\"array\");",
+                  "function checkCategory(c) {",
+                  "pm.expect(c).to.include.all.keys(\"id\",\"name\");",
+                  "pm.expect(c.id).to.be.a(\"number\");",
+                  "pm.expect(c.name).to.be.a(\"string\").and.not.empty;",
+                  "}",
+                  "pm.test(\"Поля категорий\",()=>data.forEach(checkCategory));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/categories?from=0&size=50"
+          },
+          "response": []
+        },
+        {
+          "name": "Пагинация size=1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "pm.expect(data).to.be.an(\"array\");",
+                  "pm.test(\"Размер страницы\",()=>pm.expect(data.length).to.be.at.most(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/categories?from=0&size=1"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /categories/{id}",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
+                  "var data=pm.response.json();",
+                  "function checkCategory(c) {",
+                  "pm.expect(c).to.include.all.keys(\"id\",\"name\");",
+                  "pm.expect(c.id).to.be.a(\"number\");",
+                  "pm.expect(c.name).to.be.a(\"string\").and.not.empty;",
+                  "}",
+                  "pm.test(\"Поля и id\",()=> {",
+                  "checkCategory(data);",
+                  "pm.expect(data.id).to.eql(Number(pm.collectionVariables.get(\"categoryId\")));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/categories/{{categoryId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Несуществующая категория - 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 404\",()=>pm.response.to.have.status(404));",
+                  "var e=pm.response.json();",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/categories/900000000000"
+          },
+          "response": []
+        },
+        {
+          "name": "Отрицательный from - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
+                  "var e=pm.response.json();",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/categories?from=-1"
+          },
+          "response": []
+        },
+        {
+          "name": "Нулевой size - 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
+                  "var e=pm.response.json();",
+                  "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/categories?size=0"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:7070"
+    },
+    {
+      "key": "runToken",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "categoryId",
+      "value": ""
+    },
+    {
+      "key": "eventId",
+      "value": ""
+    },
+    {
+      "key": "freeEventId",
+      "value": ""
+    },
+    {
+      "key": "compilationId",
+      "value": ""
+    },
+    {
+      "key": "initialRating",
+      "value": "0"
+    }
+  ]
+}

@@ -20,10 +20,13 @@ else
   exit 1
 fi
 
-print "Собираю сервисы..."
+print "Запускаю автотесты всех Maven-модулей..."
+"${MAVEN}" clean test
+
+print "Все тесты пройдены. Собираю сервисы..."
 "${MAVEN}" \
   -pl stats/stats-server,ewm-main-service,explore-gateway \
-  -am clean package -DskipTests
+  -am package -DskipTests
 
 print "Пересобираю и запускаю контейнеры сервисов..."
 docker compose up -d \
