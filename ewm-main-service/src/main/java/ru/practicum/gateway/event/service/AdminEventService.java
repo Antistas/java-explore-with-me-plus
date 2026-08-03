@@ -19,6 +19,7 @@ import ru.practicum.gateway.exception.ConflictException;
 import ru.practicum.gateway.exception.NotFoundException;
 import ru.practicum.gateway.request.model.RequestStatus;
 import ru.practicum.gateway.request.repository.ParticipationRequestRepository;
+import ru.practicum.gateway.rating.service.EventRatingService;
 import ru.practicum.gateway.util.OffsetPageRequest;
 
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ public class AdminEventService {
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final ParticipationRequestRepository requestRepository;
+    private final EventRatingService ratingService;
 
     public List<EventFullDto> getEvents(List<Long> users,
                                         List<String> states,
@@ -126,6 +128,7 @@ public class AdminEventService {
         EventFullDto dto = EventMapper.toEventFullDto(event);
         dto.setConfirmedRequests(requestRepository.countByEventIdAndStatus(
                 event.getId(), RequestStatus.CONFIRMED));
+        dto.setRating(ratingService.getRating(event.getId()));
         return dto;
     }
 

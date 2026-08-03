@@ -58,6 +58,7 @@ public class EventMapper {
                 .publishedOn(event.getPublishedOn())
                 .confirmedRequests(0L)
                 .views(0L)
+                .rating(0L)
                 .build();
     }
 
@@ -76,6 +77,7 @@ public class EventMapper {
                 .title(event.getTitle())
                 .confirmedRequests(0L)
                 .views(0L)
+                .rating(0L)
                 .build();
     }
 

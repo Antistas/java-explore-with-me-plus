@@ -35,4 +35,5 @@ public class EventFullDto {
     private LocalDateTime publishedOn;
     private Long confirmedRequests;
     private Long views;
+    private Long rating;
 }

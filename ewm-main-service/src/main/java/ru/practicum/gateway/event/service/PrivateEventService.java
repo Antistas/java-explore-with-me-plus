@@ -23,6 +23,7 @@ import ru.practicum.gateway.request.model.ParticipationRequest;
 import ru.practicum.gateway.request.model.RequestStatus;
 import ru.practicum.gateway.request.repository.ParticipationRequestRepository;
 import ru.practicum.gateway.request.repository.EventRequestsCount;
+import ru.practicum.gateway.rating.service.EventRatingService;
 import ru.practicum.gateway.user.model.User;
 import ru.practicum.gateway.user.repository.UserRepository;
 
@@ -42,6 +43,7 @@ public class PrivateEventService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final ParticipationRequestRepository requestRepository;
+    private final EventRatingService ratingService;
 
     /**
      * Получение событий, добавленных текущим пользователем
@@ -54,11 +56,13 @@ public class PrivateEventService {
         Pageable pageable = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findAllByInitiatorId(userId, pageable);
         Map<Long, Long> confirmedRequests = getConfirmedRequests(events);
+        Map<Long, Long> ratings = ratingService.getRatings(events);
 
         return events.stream()
                 .map(event -> {
                     EventShortDto dto = EventMapper.toEventShortDto(event);
                     dto.setConfirmedRequests(confirmedRequests.getOrDefault(event.getId(), 0L));
+                    dto.setRating(ratings.getOrDefault(event.getId(), 0L));
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -100,6 +104,7 @@ public class PrivateEventService {
         long confirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED);
         EventFullDto dto = EventMapper.toEventFullDto(event);
         dto.setConfirmedRequests(confirmedRequests);
+        dto.setRating(ratingService.getRating(eventId));
 
         return dto;
     }
@@ -156,6 +161,7 @@ public class PrivateEventService {
         long confirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED);
         EventFullDto dto = EventMapper.toEventFullDto(updated);
         dto.setConfirmedRequests(confirmedRequests);
+        dto.setRating(ratingService.getRating(eventId));
 
         return dto;
     }
