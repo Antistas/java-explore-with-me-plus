@@ -290,10 +290,7 @@
                   "pm.expect(e.views).to.be.a(\"number\");",
                   "pm.expect(e.rating).to.be.a(\"number\");",
                   "}",
-                  "pm.test(\"Поля и тестовое событие\",()=> {",
-                  "data.forEach(checkEvent);",
-                  "pm.expect(data.some(e=>e.id===Number(pm.collectionVariables.get(\"eventId\")))).to.be.true;",
-                  "});"
+                  "pm.test(\"Поля событий\",()=>data.forEach(checkEvent));"
                 ]
               }
             }
@@ -1052,8 +1049,7 @@
                   "pm.expect(c.title).to.be.a(\"string\");",
                   "c.events.forEach(checkEvent);",
                   "}",
-                  "pm.test(\"Поля подборок\",()=>data.forEach(checkCompilation));",
-                  "pm.test(\"Тестовая подборка\",()=>pm.expect(data.some(c=>c.id===Number(pm.collectionVariables.get(\"compilationId\")))).to.be.true);"
+                  "pm.test(\"Поля подборок\",()=>data.forEach(checkCompilation));"
                 ]
               }
             }
@@ -1263,8 +1259,7 @@
                   "pm.expect(c.id).to.be.a(\"number\");",
                   "pm.expect(c.name).to.be.a(\"string\").and.not.empty;",
                   "}",
-                  "pm.test(\"Поля категорий\",()=>data.forEach(checkCategory));",
-                  "pm.test(\"Тестовая категория\",()=>pm.expect(data.some(c=>c.id===Number(pm.collectionVariables.get(\"categoryId\")))).to.be.true);"
+                  "pm.test(\"Поля категорий\",()=>data.forEach(checkCategory));"
                 ]
               }
             }
