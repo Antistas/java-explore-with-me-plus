@@ -25,7 +25,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 201\",()=>pm.response.to.have.status(201));",
-                  "const b=pm.response.json();",
+                  "var b=pm.response.json();",
                   "pm.expect(b).to.include.all.keys(\"id\",\"name\",\"email\");",
                   "pm.collectionVariables.set(\"userId\",b.id);"
                 ]
@@ -61,7 +61,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 201\",()=>pm.response.to.have.status(201));",
-                  "const b=pm.response.json();",
+                  "var b=pm.response.json();",
                   "pm.expect(b).to.include.all.keys(\"id\",\"name\");",
                   "pm.collectionVariables.set(\"categoryId\",b.id);"
                 ]
@@ -97,7 +97,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 201\",()=>pm.response.to.have.status(201));",
-                  "const b=pm.response.json();",
+                  "var b=pm.response.json();",
                   "pm.expect(b.state).to.eql(\"PENDING\");",
                   "pm.collectionVariables.set(\"eventId\",b.id);"
                 ]
@@ -235,7 +235,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 201\",()=>pm.response.to.have.status(201));",
-                  "const b=pm.response.json();",
+                  "var b=pm.response.json();",
                   "pm.expect(b).to.include.all.keys(\"id\",\"events\",\"pinned\",\"title\");",
                   "pm.collectionVariables.set(\"compilationId\",b.id);"
                 ]
@@ -276,7 +276,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
                   "function checkEvent(e) {",
                   "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
@@ -314,7 +314,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
                   "function checkEvent(e) {",
                   "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
@@ -353,7 +353,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
                   "pm.test(\"Категория\",()=> {",
                   "pm.expect(data.length).to.be.greaterThan(0);",
@@ -379,7 +379,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
                   "pm.test(\"Только платные\",()=> {",
                   "pm.expect(data.length).to.be.greaterThan(0);",
@@ -405,7 +405,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
                   "pm.test(\"Только бесплатные\",()=> {",
                   "pm.expect(data.length).to.be.greaterThan(0);",
@@ -431,7 +431,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
                   "pm.test(\"Диапазон дат\",()=> {",
                   "pm.expect(data.map(e=>e.id)).to.include(Number(pm.collectionVariables.get(\"eventId\")));",
@@ -461,7 +461,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
                   "pm.test(\"Доступные события\",()=> {",
                   "const ids=data.map(e=>e.id);",
@@ -488,7 +488,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
                   "pm.test(\"По возрастанию даты\",()=> {",
                   "for(let i=1;",
@@ -517,7 +517,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
                   "pm.test(\"По убыванию просмотров\",()=> {",
                   "for(let i=1;",
@@ -546,7 +546,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
                   "pm.test(\"Размер страницы\",()=>pm.expect(data.length).to.be.at.most(1));"
                 ]
@@ -569,7 +569,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.test(\"Ответ - массив\",()=>pm.expect(data).to.be.an(\"array\"));",
                   "function checkEvent(e) {",
                   "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
@@ -608,7 +608,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.test(\"Структура ApiError\",()=> {",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");",
                   "pm.expect(e.status).to.be.a(\"string\");",
@@ -636,7 +636,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.test(\"Структура ApiError\",()=> {",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");",
                   "pm.expect(e.status).to.be.a(\"string\");",
@@ -664,7 +664,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.test(\"Структура ApiError\",()=> {",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");",
                   "pm.expect(e.status).to.be.a(\"string\");",
@@ -692,7 +692,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 400\", () => pm.response.to.have.status(400));",
-                  "const e = pm.response.json();",
+                  "var e= pm.response.json();",
                   "pm.test(\"Структура ApiError\", () => {",
                   "pm.expect(e).to.include.all.keys(\"status\", \"reason\", \"message\", \"timestamp\");",
                   "pm.expect(e.status).to.be.a(\"string\");",
@@ -720,7 +720,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.test(\"Структура ApiError\",()=> {",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");",
                   "pm.expect(e.status).to.be.a(\"string\");",
@@ -748,7 +748,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "function checkEvent(e) {",
                   "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
                   "pm.expect(e.id).to.be.a(\"number\");",
@@ -791,7 +791,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 404\",()=>pm.response.to.have.status(404));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.test(\"Структура ApiError\",()=> {",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");",
                   "pm.expect(e.status).to.be.a(\"string\");",
@@ -989,7 +989,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 404\",()=>pm.response.to.have.status(404));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
                 ]
               }
@@ -1011,7 +1011,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 404\",()=>pm.response.to.have.status(404));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
                 ]
               }
@@ -1038,7 +1038,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.expect(data).to.be.an(\"array\");",
                   "function checkEvent(e) {",
                   "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
@@ -1074,7 +1074,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.expect(data).to.be.an(\"array\");",
                   "pm.test(\"Только закреплённые\",()=> {",
                   "pm.expect(data.length).to.be.greaterThan(0);",
@@ -1100,7 +1100,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.expect(data).to.be.an(\"array\");",
                   "pm.test(\"Только незакреплённые\",()=>data.forEach(c=>pm.expect(c.pinned).to.be.false));"
                 ]
@@ -1123,7 +1123,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.expect(data).to.be.an(\"array\");",
                   "pm.test(\"Размер страницы\",()=>pm.expect(data.length).to.be.at.most(1));"
                 ]
@@ -1146,7 +1146,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "function checkEvent(e) {",
                   "pm.expect(e).to.include.all.keys(\"id\",\"annotation\",\"category\",\"eventDate\",\"initiator\",\"paid\",\"title\",\"confirmedRequests\",\"views\",\"rating\");",
                   "pm.expect(e.rating).to.be.a(\"number\");",
@@ -1185,7 +1185,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 404\",()=>pm.response.to.have.status(404));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
                 ]
               }
@@ -1207,7 +1207,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
                 ]
               }
@@ -1229,7 +1229,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
                 ]
               }
@@ -1256,7 +1256,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.expect(data).to.be.an(\"array\");",
                   "function checkCategory(c) {",
                   "pm.expect(c).to.include.all.keys(\"id\",\"name\");",
@@ -1285,7 +1285,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "pm.expect(data).to.be.an(\"array\");",
                   "pm.test(\"Размер страницы\",()=>pm.expect(data.length).to.be.at.most(1));"
                 ]
@@ -1308,7 +1308,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 200\",()=>pm.response.to.have.status(200));",
-                  "const data=pm.response.json();",
+                  "var data=pm.response.json();",
                   "function checkCategory(c) {",
                   "pm.expect(c).to.include.all.keys(\"id\",\"name\");",
                   "pm.expect(c.id).to.be.a(\"number\");",
@@ -1338,7 +1338,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 404\",()=>pm.response.to.have.status(404));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
                 ]
               }
@@ -1360,7 +1360,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
                 ]
               }
@@ -1382,7 +1382,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Статус 400\",()=>pm.response.to.have.status(400));",
-                  "const e=pm.response.json();",
+                  "var e=pm.response.json();",
                   "pm.expect(e).to.include.all.keys(\"status\",\"reason\",\"message\",\"timestamp\");"
                 ]
               }
