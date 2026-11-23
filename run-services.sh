@@ -25,7 +25,7 @@ print "Запускаю автотесты всех Maven-модулей..."
 
 print "Все тесты пройдены. Собираю сервисы..."
 "${MAVEN}" \
-  -pl stats/stats-server,ewm-main-service,explore-gateway \
+  -pl stats/stats-server,core/main-service \
   -am package -DskipTests
 
 print "Пересобираю и запускаю контейнеры сервисов..."
@@ -33,7 +33,7 @@ docker compose up -d \
   --build \
   --force-recreate \
   --no-deps \
-  stats-server ewm-service explore-gateway
+  stats-server ewm-service
 
 wait_for_service() {
   local service_name="$1"
@@ -55,7 +55,6 @@ wait_for_service() {
 
 wait_for_service "stats-server" "http://localhost:9090/actuator/health"
 wait_for_service "ewm-service" "http://localhost:8080/actuator/health"
-wait_for_service "explore-gateway" "http://localhost:7070/actuator/health"
 
 print "Текущее состояние сервисов:"
-docker compose ps stats-server ewm-service explore-gateway
+docker compose ps stats-server ewm-service
