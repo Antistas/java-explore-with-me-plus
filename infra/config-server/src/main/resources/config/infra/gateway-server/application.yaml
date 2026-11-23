@@ -1,0 +1,32 @@
+server:
+  # Единая точка входа для внешних клиентов
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        # lb:// — адрес main-service берётся из Eureka, запросы балансируются между его экземплярами
+        - id: main-service-admin-api
+          uri: lb://main-service
+          predicates:
+            - Path=/admin/**
+        - id: main-service-private-api
+          uri: lb://main-service
+          predicates:
+            - Path=/users/**,/user/**
+        - id: main-service-public-api
+          uri: lb://main-service
+          predicates:
+            - Path=/events/**,/categories/**,/compilations/**
+
+eureka:
+  client:
+    # Реестр обновляется чаще стандартных 30 с, чтобы шлюз быстрее видел новые экземпляры сервисов
+    registry-fetch-interval-seconds: 5
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
