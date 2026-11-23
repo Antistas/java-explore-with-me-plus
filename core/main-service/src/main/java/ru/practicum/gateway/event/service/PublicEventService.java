@@ -20,6 +20,7 @@ import ru.practicum.gateway.request.repository.ParticipationRequestRepository;
 import ru.practicum.gateway.rating.service.EventRatingService;
 import ru.practicum.gateway.util.OffsetPageRequest;
 import ru.practicum.stats.client.StatsClient;
+import ru.practicum.stats.client.StatsServerUnavailable;
 import ru.practicum.stats.dto.ViewStats;
 
 import java.time.LocalDate;
@@ -172,7 +173,7 @@ public class PublicEventService {
     private Map<Long, Long> loadViewsSafely(List<Event> events) {
         try {
             return loadViews(events);
-        } catch (RestClientException exception) {
+        } catch (RestClientException | StatsServerUnavailable exception) {
             log.warn("Stats-server is unavailable", exception);
             return Map.of();
         }

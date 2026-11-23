@@ -1,0 +1,35 @@
+server:
+  # Случайный порт: адрес сервиса берётся из Eureka
+  port: 0
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:6542/ewm}
+    username: ${SPRING_DATASOURCE_USERNAME:ewm}
+    password: ${SPRING_DATASOURCE_PASSWORD:ewm}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  sql:
+    init:
+      # Схема создаётся из schema.sql при каждом запуске
+      mode: always
+
+eureka:
+  client:
+    # Реестр обновляется чаще стандартных 30 с, чтобы быстрее находить stats-server после его запуска
+    registry-fetch-interval-seconds: 5
+
+stats-server:
+  service-id: stats-server
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

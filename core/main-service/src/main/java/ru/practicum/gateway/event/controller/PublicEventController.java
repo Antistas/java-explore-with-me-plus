@@ -15,6 +15,7 @@ import ru.practicum.gateway.event.dto.EventFullDto;
 import ru.practicum.gateway.event.dto.EventShortDto;
 import ru.practicum.gateway.event.service.PublicEventService;
 import ru.practicum.stats.client.StatsClient;
+import ru.practicum.stats.client.StatsServerUnavailable;
 
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class PublicEventController {
                     request.getRequestURI(),
                     getClientIp(request)
             );
-        } catch (RestClientException exception) {
+        } catch (RestClientException | StatsServerUnavailable exception) {
             log.warn("Unable to save statistics hit for {}", request.getRequestURI(), exception);
         }
     }
