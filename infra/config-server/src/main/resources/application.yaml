@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    # Конфигурации хранятся в ресурсах самого сервера, без внешнего git-репозитория
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          # {application} — имя сервиса, запросившего настройки (spring.application.name)
+          search-locations:
+            - classpath:config/core/{application}
+            - classpath:config/stats/{application}
+            - classpath:config/infra/{application}
+
+server:
+  # Случайный порт: клиенты находят сервер конфигурации через Eureka
+  port: 0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

@@ -1396,7 +1396,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:7070"
+      "value": "http://localhost:8080"
     },
     {
       "key": "runToken",

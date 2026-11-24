@@ -4,14 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cloud.client.DefaultServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestTemplate;
-import ru.practicum.stats.client.StatsClient;
 import ru.practicum.stats.dto.EndpointHit;
 import ru.practicum.stats.dto.ViewStats;
 
@@ -20,6 +23,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 
@@ -27,17 +35,27 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 class StatsClientTests {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final String SERVICE_ID = "stats-server";
     private static final String SERVER_URL = "http://localhost:9090";
 
     private ObjectMapper objectMapper;
     private StatsClient statsClient;
     private MockRestServiceServer mockServer;
 
+    @Mock
+    private DiscoveryClient discoveryClient;
+
     @BeforeEach
     void setUp() {
         RestTemplate restTemplate = new RestTemplate();
         mockServer = MockRestServiceServer.createServer(restTemplate);
-        statsClient = new StatsClient(SERVER_URL, restTemplate);
+        RetryTemplate retryTemplate = RetryTemplate.builder()
+                .maxAttempts(3)
+                .noBackoff()
+                .build();
+        statsClient = new StatsClient(discoveryClient, SERVICE_ID, restTemplate, retryTemplate);
+        lenient().when(discoveryClient.getInstances(SERVICE_ID)).thenReturn(List.of(
+                new DefaultServiceInstance("stats-1", SERVICE_ID, "localhost", 9090, false)));
         objectMapper = new ObjectMapper();
     }
 
@@ -245,5 +263,32 @@ class StatsClientTests {
         });
 
         mockServer.verify();
+    }
+
+    @Test
+    void saveHit_WhenStatsServerNotRegistered_ShouldRetryAndThrow() {
+        when(discoveryClient.getInstances(SERVICE_ID)).thenReturn(List.of());
+
+        assertThatThrownBy(() -> statsClient.saveHit("app", "/uri", "ip"))
+                .isInstanceOf(StatsServerUnavailable.class)
+                .hasMessageContaining(SERVICE_ID);
+
+        verify(discoveryClient, times(3)).getInstances(SERVICE_ID);
+    }
+
+    @Test
+    void saveHit_WhenStatsServerRegisteredOnRetry_ShouldSendRequest() {
+        when(discoveryClient.getInstances(SERVICE_ID))
+                .thenReturn(List.of())
+                .thenReturn(List.of(new DefaultServiceInstance("stats-1", SERVICE_ID, "localhost", 9090, false)));
+
+        mockServer.expect(ExpectedCount.once(), requestTo(SERVER_URL + "/hit"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(HttpStatus.CREATED));
+
+        statsClient.saveHit("app", "/uri", "ip");
+
+        mockServer.verify();
+        verify(discoveryClient, times(2)).getInstances(SERVICE_ID);
     }
 }

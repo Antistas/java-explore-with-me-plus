@@ -24,38 +24,33 @@ print "Запускаю автотесты всех Maven-модулей..."
 "${MAVEN}" clean test
 
 print "Все тесты пройдены. Собираю сервисы..."
-"${MAVEN}" \
-  -pl stats/stats-server,ewm-main-service,explore-gateway \
-  -am package -DskipTests
+"${MAVEN}" package -DskipTests
 
-print "Пересобираю и запускаю контейнеры сервисов..."
-docker compose up -d \
-  --build \
-  --force-recreate \
-  --no-deps \
-  stats-server ewm-service explore-gateway
+print "Пересобираю и запускаю контейнеры..."
+docker compose up -d --build --force-recreate
 
-wait_for_service() {
-  local service_name="$1"
-  local health_url="$2"
+wait_for_url() {
+  local name="$1"
+  local url="$2"
 
-  print "Ожидаю запуск ${service_name}..."
-  for attempt in {1..30}; do
-    if curl --fail --silent --show-error "${health_url}" >/dev/null 2>&1; then
-      print "${service_name} готов."
+  print "Ожидаю ${name}..."
+  for attempt in {1..120}; do
+    if curl --fail --silent "${url}" >/dev/null 2>&1; then
+      print "${name} готов."
       return 0
     fi
     sleep 1
   done
 
-  print -u2 "${service_name} не запустился за 30 секунд."
-  docker compose logs --no-color --tail=100 "${service_name}"
+  print -u2 "${name} не ответил за 120 секунд."
+  docker compose logs --no-color --tail=100
   return 1
 }
 
-wait_for_service "stats-server" "http://localhost:9090/actuator/health"
-wait_for_service "ewm-service" "http://localhost:8080/actuator/health"
-wait_for_service "explore-gateway" "http://localhost:7070/actuator/health"
+wait_for_url "discovery-server" "http://localhost:8761/actuator/health"
+wait_for_url "gateway-server" "http://localhost:8080/actuator/health"
+# Маршрут работает, когда main-service получил настройки, зарегистрировался в Eureka и виден шлюзу
+wait_for_url "main-service через gateway-server" "http://localhost:8080/categories"
 
 print "Текущее состояние сервисов:"
-docker compose ps stats-server ewm-service explore-gateway
+docker compose ps
